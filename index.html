@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cosmic Explorer 🌌</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <video autoplay muted loop id="bg-video">
+  <source src="space.mp4" type="video/mp4">
+</video>
+
+<div class="stars" id="stars"></div>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <span class="rotating-emoji">🌌</span>
+      <span class="logo-text">Cosmic Explorer</span>
+    </div>
+    <nav class="nav">
+      <button class="nav-btn active" data-section="search"><i class="fas fa-search"></i> Search</button>
+      <button class="nav-btn" data-section="apod"><i class="fas fa-star"></i> Daily APOD</button>
+      <button class="nav-btn" data-section="saved">
+        <i class="fas fa-heart"></i> Saved
+        <span class="saved-count" id="savedCount">0</span>
+      </button>
+      <button class="theme-toggle" id="themeToggle" title="Toggle light/dark mode">
+        <i class="fas fa-moon" id="themeIcon"></i>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- SEARCH SECTION -->
+  <section class="section active" id="searchSection">
+    <div class="section-hero">
+      <h1 class="section-title">Explore The Universe</h1>
+      <p class="section-subtitle">Search through NASA's vast library of space images, videos &amp; audio</p>
+    </div>
+    <div class="search-container">
+      <div class="search-bar">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" id="searchInput" placeholder="Search planets, galaxies, missions..." autocomplete="off">
+        <button class="btn btn-primary" id="searchBtn">Search</button>
+        <button class="btn btn-ghost" id="randomBtn" title="Random Discovery"><i class="fas fa-dice"></i> Random</button>
+      </div>
+      <div class="quick-tags">
+        <span class="tag-label">Quick explore:</span>
+        <button class="quick-tag" data-query="Mars">Mars</button>
+        <button class="quick-tag" data-query="Black Hole">Black Hole</button>
+        <button class="quick-tag" data-query="Apollo Mission">Apollo</button>
+        <button class="quick-tag" data-query="Nebula">Nebula</button>
+        <button class="quick-tag" data-query="Hubble">Hubble</button>
+        <button class="quick-tag" data-query="Saturn">Saturn</button>
+        <button class="quick-tag" data-query="Galaxy">Galaxy</button>
+      </div>
+    </div>
+    <div class="controls" id="controls">
+      <div class="filter-group">
+        <label>Media Type:</label>
+        <div class="filter-btns">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="image"><i class="fas fa-image"></i> Images</button>
+          <button class="filter-btn" data-filter="video"><i class="fas fa-video"></i> Videos</button>
+          <button class="filter-btn" data-filter="audio"><i class="fas fa-volume-up"></i> Audio</button>
+        </div>
+      </div>
+      <div class="sort-group">
+        <label for="sortSelect">Sort By:</label>
+        <select id="sortSelect">
+          <option value="default">Default (Relevance)</option>
+          <option value="az">Title A → Z</option>
+          <option value="za">Title Z → A</option>
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+        </select>
+      </div>
+      <div class="results-info" id="resultsInfo"></div>
+    </div>
+    <div class="gallery" id="gallery">
+      <div class="empty-state" id="emptyState">
+        <i class="fas fa-satellite-dish"></i>
+        <p>Enter a search term to begin your cosmic journey</p>
+      </div>
+    </div>
+    <div class="load-more-container" id="loadMoreContainer" style="display:none">
+      <button class="btn btn-primary btn-wide" id="loadMoreBtn">
+        <i class="fas fa-chevron-down"></i> Load More
+      </button>
+    </div>
+  </section>
+
+  <!-- APOD SECTION -->
+  <section class="section" id="apodSection">
+    <div class="section-hero">
+      <h1 class="section-title">Astronomy Picture of the Day</h1>
+      <p class="section-subtitle">NASA's daily showcase of the cosmos — curated by professional astronomers</p>
+    </div>
+    <div class="apod-date-picker">
+      <div class="date-group">
+        <label for="apodDateInput"><i class="fas fa-calendar-alt"></i> Pick a date (back to Jun 16, 1995)</label>
+        <input type="date" class="date-input" id="apodDateInput" min="1995-06-16" max="">
+      </div>
+      <button class="btn btn-primary" id="apodGoBtn"><i class="fas fa-rocket"></i> Go</button>
+      <button class="btn btn-ghost" id="apodTodayBtn"><i class="fas fa-star"></i> Today</button>
+      <button class="btn btn-ghost" id="apodRandomBtn"><i class="fas fa-dice"></i> Random Date</button>
+    </div>
+    <div class="apod-card" id="apodCard">
+      <div class="loader-wrap"><div class="loader"></div><p>Fetching today's cosmic wonder...</p></div>
+    </div>
+  </section>
+
+  <!-- SAVED SECTION -->
+  <section class="section" id="savedSection">
+    <div class="section-hero">
+      <h1 class="section-title">My Collection</h1>
+      <p class="section-subtitle">Your handpicked favorites from across the universe</p>
+    </div>
+    <div class="saved-actions" id="savedActions" style="display:none">
+      <button class="btn btn-danger" id="clearSavedBtn"><i class="fas fa-trash"></i> Clear All</button>
+    </div>
+    <div class="gallery" id="savedGallery">
+      <div class="empty-state" id="savedEmptyState">
+        <i class="fas fa-heart-broken"></i>
+        <p>No saved items yet. Start exploring and save your favorites!</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modal">
+    <button class="modal-close" id="modalClose"><i class="fas fa-times"></i></button>
+    <div class="modal-content" id="modalContent"></div>
+  </div>
+</div>
+
+<!-- FULLSCREEN IMAGE -->
+<div class="fullscreen-overlay" id="fullscreenOverlay" onclick="closeFullscreen()">
+  <img id="fullscreenImg" src="" alt="Full resolution">
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loader"></div>
+  <p>Scanning the cosmos...</p>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
