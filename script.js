@@ -1,3 +1,4 @@
+// ==================== CONFIG (Lecture 1: const, data types) ====================
 const CONFIG = {
   NASA_API_KEY: "faywMKSbtCyhgDMGjJ5xR6qwJ4SUMVbN1PGvOuIx",
   SEARCH_API: "https://images-api.nasa.gov/search",
@@ -10,9 +11,9 @@ const RANDOM_TOPICS = [
   "Saturn Rings", "Solar Flare", "Comet", "Aurora Borealis", "Crab Nebula",
   "Pluto", "Mars Rover", "Artemis", "James Webb", "Black Hole", "Exoplanet",
   "Cassini", "Eclipse", "Dark Matter", "Asteroid Belt", "Titan", "Europa",
-  "Ganymede", "Neutron Star", "Quasar", "Pulsar", "Mercury Transit", "Venus", "Deep Space",
 ];
 
+// ==================== STATE (Lecture 1: let) ====================
 let state = {
   allResults: [],
   displayedItems: [],
@@ -26,7 +27,10 @@ let state = {
   currentAPOD: null,
 };
 
-const $ = (id) => document.getElementById(id);
+// ==================== DOM ELEMENTS (Lecture 1) ====================
+function $(id) {
+  return document.getElementById(id);
+}
 
 const dom = {
   searchInput: $("searchInput"),
@@ -50,7 +54,6 @@ const dom = {
   savedCount: $("savedCount"),
   clearSavedBtn: $("clearSavedBtn"),
   modalOverlay: $("modalOverlay"),
-  modal: $("modal"),
   modalClose: $("modalClose"),
   modalContent: $("modalContent"),
   toast: $("toast"),
@@ -62,8 +65,8 @@ const dom = {
   fullscreenImg: $("fullscreenImg"),
 };
 
-// ── INIT ──
-document.addEventListener("DOMContentLoaded", () => {
+// ==================== INITIALIZATION ====================
+document.addEventListener("DOMContentLoaded", function() {
   generateStars();
   loadSavedItems();
   updateSavedCount();
@@ -74,51 +77,87 @@ document.addEventListener("DOMContentLoaded", () => {
   bindThemeToggle();
   bindAPODControls();
   applyStoredTheme();
-  const todayStr = new Date().toISOString().slice(0, 10);
+  
+  let todayStr = new Date().toISOString().slice(0, 10);
   dom.apodDateInput.max = todayStr;
   dom.apodDateInput.value = todayStr;
   fetchAPOD();
 });
 
-// ── STARS ──
+// ==================== STARS GENERATION (forEach) ====================
 function generateStars() {
-  const count = window.innerWidth < 768 ? 80 : 160;
-  const frag = document.createDocumentFragment();
-  for (let i = 0; i < count; i++) {
-    const star = document.createElement("div");
+  let count = window.innerWidth < 768 ? 80 : 160;
+  let starsArray = Array(count).fill();
+  
+  starsArray.forEach(function() {
+    let star = document.createElement("div");
     star.className = "star";
-    const size = Math.random() * 2.5 + 0.5;
-    star.style.cssText = `width:${size}px;height:${size}px;top:${Math.random() * 100}%;left:${Math.random() * 100}%;--dur:${(Math.random() * 4 + 2).toFixed(1)}s;animation-delay:${(Math.random() * 5).toFixed(1)}s;opacity:${Math.random() * 0.6 + 0.1};`;
-    frag.appendChild(star);
-  }
-  dom.stars.appendChild(frag);
-}
-
-// ── DARK / LIGHT MODE ──
-function applyStoredTheme() {
-  const saved = localStorage.getItem("spaceTheme") || "dark";
-  document.documentElement.setAttribute("data-theme", saved);
-  dom.themeIcon.className = saved === "dark" ? "fas fa-moon" : "fas fa-sun";
-}
-
-function bindThemeToggle() {
-  dom.themeToggle.addEventListener("click", () => {
-    const current = document.documentElement.getAttribute("data-theme");
-    const next = current === "dark" ? "light" : "dark";
-    document.documentElement.setAttribute("data-theme", next);
-    localStorage.setItem("spaceTheme", next);
-    dom.themeIcon.className = next === "dark" ? "fas fa-moon" : "fas fa-sun";
-    showToast(next === "dark" ? "🌙 Dark mode on" : "☀️ Light mode on");
+    let size = Math.random() * 2.5 + 0.5;
+    let top = Math.random() * 100;
+    let left = Math.random() * 100;
+    let duration = (Math.random() * 4 + 2).toFixed(1);
+    let delay = (Math.random() * 5).toFixed(1);
+    let opacity = Math.random() * 0.6 + 0.1;
+    
+    star.style.cssText = "width:" + size + "px;height:" + size + "px;top:" + top + "%;left:" + left + "%;--dur:" + duration + "s;animation-delay:" + delay + "s;opacity:" + opacity + ";";
+    dom.stars.appendChild(star);
   });
 }
 
-// ── NAVIGATION ──
+// ==================== THEME (Lecture 2: if/else) ====================
+function applyStoredTheme() {
+  let saved = localStorage.getItem("spaceTheme");
+  
+  if (saved === null) {
+    saved = "dark";
+  }
+  
+  document.documentElement.setAttribute("data-theme", saved);
+  
+  if (saved === "dark") {
+    dom.themeIcon.className = "fas fa-moon";
+  } else {
+    dom.themeIcon.className = "fas fa-sun";
+  }
+}
+
+function bindThemeToggle() {
+  dom.themeToggle.addEventListener("click", function() {
+    let current = document.documentElement.getAttribute("data-theme");
+    let next;
+    
+    if (current === "dark") {
+      next = "light";
+    } else {
+      next = "dark";
+    }
+    
+    document.documentElement.setAttribute("data-theme", next);
+    localStorage.setItem("spaceTheme", next);
+    
+    if (next === "dark") {
+      dom.themeIcon.className = "fas fa-moon";
+      showToast("🌙 Dark mode on");
+    } else {
+      dom.themeIcon.className = "fas fa-sun";
+      showToast("☀️ Light mode on");
+    }
+  });
+}
+
+// ==================== NAVIGATION (forEach) ====================
 function bindNavigation() {
-  document.querySelectorAll(".nav-btn[data-section]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const target = btn.dataset.section;
+  let navButtons = document.querySelectorAll(".nav-btn[data-section]");
+  
+  navButtons.forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      let target = btn.dataset.section;
       switchSection(target);
-      document.querySelectorAll(".nav-btn[data-section]").forEach((b) => b.classList.remove("active"));
+      
+      navButtons.forEach(function(b) {
+        b.classList.remove("active");
+      });
+      
       btn.classList.add("active");
     });
   });
@@ -126,77 +165,82 @@ function bindNavigation() {
 
 function switchSection(name) {
   state.activeSection = name;
-  document.querySelectorAll(".section").forEach((s) => s.classList.remove("active"));
-  $(`${name}Section`).classList.add("active");
-  if (name === "saved") renderSavedGallery();
+  let sections = document.querySelectorAll(".section");
+  
+  sections.forEach(function(s) {
+    s.classList.remove("active");
+  });
+  
+  $(name + "Section").classList.add("active");
+  
+  if (name === "saved") {
+    renderSavedGallery();
+  }
 }
 
-// ── DEBOUNCE ──
-function debounce(fn, delay) {
-  let timer;
-  return function (...args) {
-    clearTimeout(timer);
-    timer = setTimeout(() => fn.apply(this, args), delay);
-  };
-}
-
-// ── SEARCH BINDINGS ──
+// ==================== SEARCH (Lecture 12: async/await, try/catch) ====================
 function bindSearch() {
   dom.searchBtn.addEventListener("click", handleSearch);
-  dom.searchInput.addEventListener("input", debounce(handleSearch, 600));
-  dom.searchInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") handleSearch();
+  
+  dom.searchInput.addEventListener("keydown", function(e) {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
   });
-  dom.randomBtn.addEventListener("click", () => {
-    dom.searchInput.value = RANDOM_TOPICS[Math.floor(Math.random() * RANDOM_TOPICS.length)];
+  
+  dom.randomBtn.addEventListener("click", function() {
+    let randomIndex = Math.floor(Math.random() * RANDOM_TOPICS.length);
+    dom.searchInput.value = RANDOM_TOPICS[randomIndex];
     handleSearch();
   });
-  document.querySelectorAll(".quick-tag").forEach((tag) => {
-    tag.addEventListener("click", () => {
+  
+  let quickTags = document.querySelectorAll(".quick-tag");
+  quickTags.forEach(function(tag) {
+    tag.addEventListener("click", function() {
       dom.searchInput.value = tag.dataset.query;
       handleSearch();
     });
   });
+  
   dom.loadMoreBtn.addEventListener("click", loadMore);
-  dom.sortSelect.addEventListener("change", () => {
+  dom.sortSelect.addEventListener("change", function() {
     state.currentSort = dom.sortSelect.value;
     applyFilterSortAndRender();
   });
 }
 
-// ── FILTER BINDINGS ──
-function bindFilters() {
-  document.querySelectorAll(".filter-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll(".filter-btn").forEach((b) => b.classList.remove("active"));
-      btn.classList.add("active");
-      state.currentFilter = btn.dataset.filter;
-      state.currentPage = 1;
-      applyFilterSortAndRender();
-    });
-  });
-}
-
-// ── HANDLE SEARCH ──
 async function handleSearch() {
-  const query = dom.searchInput.value.trim();
-  if (!query) return;
+  let query = dom.searchInput.value.trim();
+  
+  if (query === "") {
+    return;
+  }
 
   state.currentPage = 1;
   state.currentFilter = "all";
   state.currentSort = "default";
   dom.sortSelect.value = "default";
-  document.querySelectorAll(".filter-btn").forEach((b) => b.classList.remove("active"));
+  
+  let filterBtns = document.querySelectorAll(".filter-btn");
+  filterBtns.forEach(function(btn) {
+    btn.classList.remove("active");
+  });
+  
   document.querySelector('.filter-btn[data-filter="all"]').classList.add("active");
 
   showLoading(true);
   clearGallery();
 
   try {
-    const data = await fetchNASASearch(query);
-    if (!data || !data.collection || !data.collection.items) throw new Error("No data");
-    const items = data.collection.items;
+    let data = await fetchNASASearch(query);
+    
+    if (!data || !data.collection || !data.collection.items) {
+      throw new Error("No data");
+    }
+    
+    let items = data.collection.items;
     state.allResults = items;
+    
     if (items.length === 0) {
       showEmptyState(dom.gallery, dom.emptyState, "🌌 No results found. Try a different search term.");
       dom.loadMoreContainer.style.display = "none";
@@ -204,6 +248,7 @@ async function handleSearch() {
       dom.emptyState.style.display = "none";
       applyFilterSortAndRender();
     }
+    
     dom.controls.style.display = "flex";
   } catch (err) {
     console.error(err);
@@ -214,88 +259,177 @@ async function handleSearch() {
 }
 
 async function fetchNASASearch(query) {
-  const url = `${CONFIG.SEARCH_API}?q=${encodeURIComponent(query)}&page_size=100`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  let url = CONFIG.SEARCH_API + "?q=" + encodeURIComponent(query) + "&page_size=100";
+  let res = await fetch(url);
+  
+  if (!res.ok) {
+    throw new Error("HTTP " + res.status);
+  }
+  
   return res.json();
 }
 
-// ── FILTER + SORT + RENDER (Array HOFs) ──
+// ==================== FILTER + SORT (forEach, sort) ====================
 function applyFilterSortAndRender() {
-  let items = state.currentFilter !== "all"
-    ? state.allResults.filter((item) => item.data?.[0]?.media_type === state.currentFilter)
-    : [...state.allResults];
+  let items;
+  
+  if (state.currentFilter !== "all") {
+    items = [];
+    state.allResults.forEach(function(item) {
+      if (item.data && item.data[0] && item.data[0].media_type === state.currentFilter) {
+        items.push(item);
+      }
+    });
+  } else {
+    items = [];
+    state.allResults.forEach(function(item) {
+      items.push(item);
+    });
+  }
+  
   items = sortItems(items, state.currentSort);
   state.displayedItems = items;
   state.currentPage = 1;
-  renderGallery(items.slice(0, CONFIG.PAGE_SIZE), dom.gallery, false);
+  
+  let firstPage = items.slice(0, CONFIG.PAGE_SIZE);
+  
+  renderGallery(firstPage, dom.gallery, false);
   updateResultsInfo(items.length);
   updateLoadMore(items.length);
 }
 
 function sortItems(items, sortType) {
-  const copy = [...items];
-  switch (sortType) {
-    case "az":
-      return copy.sort((a, b) => (a.data?.[0]?.title || "").localeCompare(b.data?.[0]?.title || ""));
-    case "za":
-      return copy.sort((a, b) => (b.data?.[0]?.title || "").localeCompare(a.data?.[0]?.title || ""));
-    case "newest":
-      return copy.sort((a, b) => new Date(b.data?.[0]?.date_created || 0) - new Date(a.data?.[0]?.date_created || 0));
-    case "oldest":
-      return copy.sort((a, b) => new Date(a.data?.[0]?.date_created || 0) - new Date(b.data?.[0]?.date_created || 0));
-    default:
-      return copy;
+  let copy = [];
+  items.forEach(function(item) {
+    copy.push(item);
+  });
+  
+  if (sortType === "az") {
+    copy.sort(function(a, b) {
+      let titleA = a.data && a.data[0] && a.data[0].title ? a.data[0].title : "";
+      let titleB = b.data && b.data[0] && b.data[0].title ? b.data[0].title : "";
+      
+      if (titleA < titleB) return -1;
+      if (titleA > titleB) return 1;
+      return 0;
+    });
+  } 
+  else if (sortType === "za") {
+    copy.sort(function(a, b) {
+      let titleA = a.data && a.data[0] && a.data[0].title ? a.data[0].title : "";
+      let titleB = b.data && b.data[0] && b.data[0].title ? b.data[0].title : "";
+      
+      if (titleB < titleA) return -1;
+      if (titleB > titleA) return 1;
+      return 0;
+    });
   }
+  else if (sortType === "newest") {
+    copy.sort(function(a, b) {
+      let dateA = a.data && a.data[0] && a.data[0].date_created ? new Date(a.data[0].date_created).getTime() : 0;
+      let dateB = b.data && b.data[0] && b.data[0].date_created ? new Date(b.data[0].date_created).getTime() : 0;
+      return dateB - dateA;
+    });
+  }
+  else if (sortType === "oldest") {
+    copy.sort(function(a, b) {
+      let dateA = a.data && a.data[0] && a.data[0].date_created ? new Date(a.data[0].date_created).getTime() : 0;
+      let dateB = b.data && b.data[0] && b.data[0].date_created ? new Date(b.data[0].date_created).getTime() : 0;
+      return dateA - dateB;
+    });
+  }
+  
+  return copy;
 }
 
-// ── LOAD MORE ──
+// ==================== LOAD MORE ====================
 function loadMore() {
   state.currentPage++;
-  const start = (state.currentPage - 1) * CONFIG.PAGE_SIZE;
-  const end = start + CONFIG.PAGE_SIZE;
-  const next = state.displayedItems.slice(start, end);
-  if (next.length > 0) renderGallery(next, dom.gallery, true);
-  if (end >= state.displayedItems.length) dom.loadMoreContainer.style.display = "none";
+  let start = (state.currentPage - 1) * CONFIG.PAGE_SIZE;
+  let end = start + CONFIG.PAGE_SIZE;
+  
+  let next = state.displayedItems.slice(start, end);
+  
+  if (next.length > 0) {
+    renderGallery(next, dom.gallery, true);
+  }
+  
+  if (end >= state.displayedItems.length) {
+    dom.loadMoreContainer.style.display = "none";
+  }
 }
 
 function updateLoadMore(total) {
-  dom.loadMoreContainer.style.display = total > CONFIG.PAGE_SIZE ? "block" : "none";
+  if (total > CONFIG.PAGE_SIZE) {
+    dom.loadMoreContainer.style.display = "block";
+  } else {
+    dom.loadMoreContainer.style.display = "none";
+  }
 }
 
 function updateResultsInfo(count) {
-  dom.resultsInfo.textContent = `${count.toLocaleString()} result${count !== 1 ? "s" : ""} found`;
+  let message = count.toLocaleString() + " result";
+  if (count !== 1) {
+    message = message + "s";
+  }
+  message = message + " found";
+  dom.resultsInfo.textContent = message;
 }
 
-// ── RENDER GALLERY ──
-function renderGallery(items, container, append = false) {
+// ==================== RENDER GALLERY (forEach) ====================
+function renderGallery(items, container, append) {
   if (!append) {
-    Array.from(container.children).forEach((child) => {
-      if (!child.classList.contains("empty-state")) container.removeChild(child);
+    let children = Array.from(container.children);
+    children.forEach(function(child) {
+      if (!child.classList.contains("empty-state")) {
+        container.removeChild(child);
+      }
     });
   }
-  const frag = document.createDocumentFragment();
-  items.forEach((item) => {
-    const data = item.data?.[0];
-    if (!data) return;
-    const mediaType = data.media_type || "image";
-    const title = data.title || "Untitled";
-    const date = formatDate(data.date_created);
-    const desc = data.description || data.description_508 || "No description available.";
-    const nasaId = data.nasa_id;
-    const links = item.links || [];
-    const thumbUrl = links.find((l) => l.rel === "preview")?.href || null;
-    const isSaved = isItemSaved(nasaId);
-
-    const card = document.createElement("div");
+  
+  items.forEach(function(item) {
+    let data = item.data ? item.data[0] : null;
+    
+    if (!data) {
+      return;
+    }
+    
+    let mediaType = data.media_type || "image";
+    let title = data.title || "Untitled";
+    let date = formatDate(data.date_created);
+    let desc = data.description || data.description_508 || "No description available.";
+    let nasaId = data.nasa_id;
+    let links = item.links || [];
+    
+    let thumbUrl = null;
+    links.forEach(function(link) {
+      if (link.rel === "preview") {
+        thumbUrl = link.href;
+      }
+    });
+    
+    let isSaved = isItemSaved(nasaId);
+    
+    let card = document.createElement("div");
     card.className = "card";
     card.dataset.nasaId = nasaId;
+    
+    let mediaHtml = buildCardMedia(mediaType, thumbUrl);
+    let badgeClass = "card-type-badge badge-" + mediaType;
+    let saveBtnClass = "card-save-btn";
+    
+    if (isSaved) {
+      saveBtnClass = saveBtnClass + " saved";
+    }
+    
+    let heartIcon = "fa" + (isSaved ? "s" : "r") + " fa-heart";
+    
     card.innerHTML = `
       <div class="card-media">
-        ${buildCardMedia(mediaType, thumbUrl)}
-        <span class="card-type-badge badge-${mediaType}">${mediaType}</span>
-        <button class="card-save-btn ${isSaved ? "saved" : ""}" data-nasa-id="${nasaId}" title="${isSaved ? "Remove from saved" : "Save item"}">
-          <i class="fa${isSaved ? "s" : "r"} fa-heart"></i>
+        ${mediaHtml}
+        <span class="${badgeClass}">${mediaType}</span>
+        <button class="${saveBtnClass}" data-nasa-id="${nasaId}" title="${isSaved ? "Remove from saved" : "Save item"}">
+          <i class="${heartIcon}"></i>
         </button>
       </div>
       <div class="card-body">
@@ -304,33 +438,47 @@ function renderGallery(items, container, append = false) {
         <div class="card-desc">${escHtml(desc)}</div>
       </div>
     `;
-    card.querySelector(".card-save-btn").addEventListener("click", (e) => {
+    
+    let saveBtn = card.querySelector(".card-save-btn");
+    saveBtn.addEventListener("click", function(e) {
       e.stopPropagation();
       toggleSave(item, e.currentTarget);
     });
-    card.addEventListener("click", () => openModal(item));
-    frag.appendChild(card);
+    
+    card.addEventListener("click", function() {
+      openModal(item);
+    });
+    
+    container.appendChild(card);
   });
-  container.appendChild(frag);
 }
 
 function buildCardMedia(type, thumbUrl) {
-  if (type === "image" && thumbUrl)
-    return `<img src="${thumbUrl}" alt="Space image" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'card-media-icon\\'><i class=\\'fas fa-image\\'></i><span>Image not available</span></div>'" />`;
-  if (type === "video")
-    return `<div class="card-media-icon"><i class="fas fa-play-circle"></i><span>Video</span></div>`;
-  if (type === "audio")
-    return `<div class="card-media-icon"><i class="fas fa-headphones"></i><span>Audio</span></div>`;
-  return `<div class="card-media-icon"><i class="fas fa-satellite"></i><span>Media</span></div>`;
+  if (type === "image" && thumbUrl) {
+    return '<img src="' + thumbUrl + '" alt="Space image" loading="lazy" onerror="this.parentElement.innerHTML=\'<div class=\\\'card-media-icon\\\'><i class=\\\'fas fa-image\\\'></i><span>Image not available</span></div>\'" />';
+  }
+  
+  if (type === "video") {
+    return '<div class="card-media-icon"><i class="fas fa-play-circle"></i><span>Video</span></div>';
+  }
+  
+  if (type === "audio") {
+    return '<div class="card-media-icon"><i class="fas fa-headphones"></i><span>Audio</span></div>';
+  }
+  
+  return '<div class="card-media-icon"><i class="fas fa-satellite"></i><span>Media</span></div>';
 }
 
-// ── MODAL ──
+// ==================== MODAL (Lecture 12: async/await) ====================
 function bindModal() {
   dom.modalClose.addEventListener("click", closeModal);
-  dom.modalOverlay.addEventListener("click", (e) => {
-    if (e.target === dom.modalOverlay) closeModal();
+  dom.modalOverlay.addEventListener("click", function(e) {
+    if (e.target === dom.modalOverlay) {
+      closeModal();
+    }
   });
-  document.addEventListener("keydown", (e) => {
+  
+  document.addEventListener("keydown", function(e) {
     if (e.key === "Escape") {
       closeModal();
       closeFullscreen();
@@ -339,130 +487,211 @@ function bindModal() {
 }
 
 async function openModal(item) {
-  const data = item.data?.[0];
+  let data = item.data ? item.data[0] : null;
   if (!data) return;
-  const mediaType = data.media_type || "image";
-  const title = data.title || "Untitled";
-  const date = formatDate(data.date_created);
-  const desc = data.description || data.description_508 || "No description available.";
-  const nasaId = data.nasa_id;
-  const isSaved = isItemSaved(nasaId);
-
+  
+  let mediaType = data.media_type || "image";
+  let title = data.title || "Untitled";
+  let date = formatDate(data.date_created);
+  let desc = data.description || data.description_508 || "No description available.";
+  let nasaId = data.nasa_id;
+  let isSaved = isItemSaved(nasaId);
+  
   dom.modalOverlay.classList.add("open");
   document.body.style.overflow = "hidden";
-  dom.modalContent.innerHTML = `<div class="loader-wrap"><div class="loader"></div><p>Loading media...</p></div>`;
-
+  dom.modalContent.innerHTML = '<div class="loader-wrap"><div class="loader"></div><p>Loading media...</p></div>';
+  
   let mediaHtml = "";
+  
   try {
-    const assetUrl = `https://images-api.nasa.gov/asset/${encodeURIComponent(nasaId)}`;
-    const res = await fetch(assetUrl);
-    const assetData = await res.json();
-    const hrefs = (assetData?.collection?.items || []).map((a) => a.href);
-
-    if (mediaType === "image") {
-      const imgSrc =
-        hrefs.find((h) => h.match(/~orig\.(jpg|jpeg|png|gif|tif)/i)) ||
-        hrefs.find((h) => h.match(/\.(jpg|jpeg|png|gif)/i)) ||
-        item.links?.[0]?.href || "";
-      mediaHtml = imgSrc
-        ? `<img class="modal-media" src="${imgSrc}" alt="${escHtml(title)}" style="cursor:zoom-in" onclick="openFullscreen('${imgSrc}')" />`
-        : `<div class="card-media-icon" style="min-height:200px;border-radius:var(--radius);"><i class="fas fa-image"></i><span>Image not available</span></div>`;
-    } else if (mediaType === "video") {
-      const videoSrc = hrefs.find((h) => h.endsWith(".mp4")) || "";
-      const thumbSrc = item.links?.find((l) => l.rel === "preview")?.href || "";
-      if (videoSrc) {
-        mediaHtml = `<video class="modal-media" controls poster="${thumbSrc}" style="max-height:420px;background:#000;"><source src="${videoSrc}" type="video/mp4" />Your browser does not support the video tag.</video>`;
-      } else {
-        const ytHref = hrefs.find((h) => h.includes("youtube")) || "";
-        mediaHtml = ytHref
-          ? `<div class="modal-iframe-wrap"><iframe src="${ytHref}" allowfullscreen></iframe></div>`
-          : `<div class="card-media-icon" style="min-height:200px;border-radius:var(--radius);"><i class="fas fa-video"></i><span>Video not available</span></div>`;
-      }
-    } else if (mediaType === "audio") {
-      const audioSrc = hrefs.find((h) => h.match(/\.(mp3|wav|ogg|m4a)/i)) || "";
-      mediaHtml = audioSrc
-        ? `<audio class="modal-audio" controls src="${audioSrc}"></audio>`
-        : `<div class="card-media-icon" style="min-height:140px;border-radius:var(--radius);"><i class="fas fa-headphones"></i><span>Audio not available</span></div>`;
+    let assetUrl = "https://images-api.nasa.gov/asset/" + encodeURIComponent(nasaId);
+    let res = await fetch(assetUrl);
+    let assetData = await res.json();
+    
+    let hrefs = [];
+    if (assetData && assetData.collection && assetData.collection.items) {
+      assetData.collection.items.forEach(function(assetItem) {
+        hrefs.push(assetItem.href);
+      });
     }
-  } catch {
-    mediaHtml = `<div class="card-media-icon" style="min-height:180px;border-radius:var(--radius);"><i class="fas fa-satellite"></i><span>Media not available</span></div>`;
+    
+    if (mediaType === "image") {
+      let imgSrc = "";
+      
+      hrefs.forEach(function(href) {
+        if (href.match(/~orig\.(jpg|jpeg|png|gif|tif)/i) && imgSrc === "") {
+          imgSrc = href;
+        }
+      });
+      
+      if (imgSrc === "") {
+        hrefs.forEach(function(href) {
+          if (href.match(/\.(jpg|jpeg|png|gif)/i) && imgSrc === "") {
+            imgSrc = href;
+          }
+        });
+      }
+      
+      if (imgSrc === "" && item.links && item.links[0]) {
+        imgSrc = item.links[0].href || "";
+      }
+      
+      if (imgSrc) {
+        mediaHtml = '<img class="modal-media" src="' + imgSrc + '" alt="' + escHtml(title) + '" style="cursor:zoom-in" onclick="openFullscreen(\'' + imgSrc + '\')" />';
+      } else {
+        mediaHtml = '<div class="card-media-icon" style="min-height:200px;border-radius:var(--radius);"><i class="fas fa-image"></i><span>Image not available</span></div>';
+      }
+    }
+    else if (mediaType === "video") {
+      let videoSrc = "";
+      hrefs.forEach(function(href) {
+        if (href.endsWith(".mp4") && videoSrc === "") {
+          videoSrc = href;
+        }
+      });
+      
+      let thumbSrc = "";
+      if (item.links) {
+        item.links.forEach(function(link) {
+          if (link.rel === "preview") {
+            thumbSrc = link.href;
+          }
+        });
+      }
+      
+      if (videoSrc) {
+        mediaHtml = '<video class="modal-media" controls poster="' + thumbSrc + '" style="max-height:420px;background:#000;"><source src="' + videoSrc + '" type="video/mp4" />Your browser does not support the video tag.</video>';
+      } else {
+        let ytHref = "";
+        hrefs.forEach(function(href) {
+          if (href.includes("youtube") && ytHref === "") {
+            ytHref = href;
+          }
+        });
+        
+        if (ytHref) {
+          mediaHtml = '<div class="modal-iframe-wrap"><iframe src="' + ytHref + '" allowfullscreen></iframe></div>';
+        } else {
+          mediaHtml = '<div class="card-media-icon" style="min-height:200px;border-radius:var(--radius);"><i class="fas fa-video"></i><span>Video not available</span></div>';
+        }
+      }
+    }
+    else if (mediaType === "audio") {
+      let audioSrc = "";
+      hrefs.forEach(function(href) {
+        if (href.match(/\.(mp3|wav|ogg|m4a)/i) && audioSrc === "") {
+          audioSrc = href;
+        }
+      });
+      
+      if (audioSrc) {
+        mediaHtml = '<audio class="modal-audio" controls src="' + audioSrc + '"></audio>';
+      } else {
+        mediaHtml = '<div class="card-media-icon" style="min-height:140px;border-radius:var(--radius);"><i class="fas fa-headphones"></i><span>Audio not available</span></div>';
+      }
+    }
+  } catch (error) {
+    mediaHtml = '<div class="card-media-icon" style="min-height:180px;border-radius:var(--radius);"><i class="fas fa-satellite"></i><span>Media not available</span></div>';
   }
-
+  
+  let badgeHtml = '<span class="modal-type-badge badge-' + mediaType + ' card-type-badge">' + mediaType + '</span>';
+  let heartIcon = "fa" + (isSaved ? "s" : "r") + " fa-heart";
+  let saveBtnText = isSaved ? "Saved!" : "Save to Collection";
+  
   dom.modalContent.innerHTML = `
     ${mediaHtml}
-    <span class="modal-type-badge badge-${mediaType} card-type-badge">${mediaType}</span>
+    ${badgeHtml}
     <h2 class="modal-title">${escHtml(title)}</h2>
     <div class="modal-date"><i class="fas fa-calendar-alt"></i>${date}</div>
     <p class="modal-desc">${escHtml(desc)}</p>
     <div class="modal-actions">
       <button class="btn btn-primary" id="modalSaveBtn">
-        <i class="fa${isSaved ? "s" : "r"} fa-heart"></i>
-        ${isSaved ? "Saved!" : "Save to Collection"}
+        <i class="${heartIcon}"></i>
+        ${saveBtnText}
       </button>
       <a class="btn btn-ghost" href="https://images.nasa.gov/details-${encodeURIComponent(nasaId)}" target="_blank" rel="noopener">
         <i class="fas fa-external-link-alt"></i> View on NASA
       </a>
     </div>
   `;
-
-  $("modalSaveBtn").addEventListener("click", () => {
-    toggleSave(item, $("modalSaveBtn"), true);
-    const nowSaved = isItemSaved(nasaId);
-    $("modalSaveBtn").innerHTML = `<i class="fa${nowSaved ? "s" : "r"} fa-heart"></i> ${nowSaved ? "Saved!" : "Save to Collection"}`;
+  
+  let modalSaveBtn = $("modalSaveBtn");
+  modalSaveBtn.addEventListener("click", function() {
+    toggleSave(item, modalSaveBtn, true);
+    let nowSaved = isItemSaved(nasaId);
+    let newHeartIcon = "fa" + (nowSaved ? "s" : "r") + " fa-heart";
+    let newBtnText = nowSaved ? "Saved!" : "Save to Collection";
+    modalSaveBtn.innerHTML = '<i class="' + newHeartIcon + '"></i> ' + newBtnText;
   });
 }
 
 function closeModal() {
   dom.modalOverlay.classList.remove("open");
   document.body.style.overflow = "";
-  dom.modalContent.querySelectorAll("video, audio").forEach((el) => el.pause());
+  
+  let mediaElements = dom.modalContent.querySelectorAll("video, audio");
+  mediaElements.forEach(function(el) {
+    el.pause();
+  });
 }
 
-// ── FULLSCREEN ──
-window.openFullscreen = function (src) {
+// ==================== FULLSCREEN ====================
+function openFullscreen(src) {
   dom.fullscreenImg.src = src;
   dom.fullscreenOverlay.classList.add("open");
-};
+}
 
-window.closeFullscreen = function () {
+function closeFullscreen() {
   dom.fullscreenOverlay.classList.remove("open");
   dom.fullscreenImg.src = "";
-};
+}
 
-// ── APOD CONTROLS ──
+window.openFullscreen = openFullscreen;
+window.closeFullscreen = closeFullscreen;
+
+// ==================== APOD (Lecture 12: async/await) ====================
 function bindAPODControls() {
-  dom.apodGoBtn.addEventListener("click", () => {
-    const date = dom.apodDateInput.value;
+  dom.apodGoBtn.addEventListener("click", function() {
+    let date = dom.apodDateInput.value;
     if (!date) {
       showToast("⚠️ Please pick a date");
       return;
     }
     fetchAPOD(date);
   });
-  dom.apodTodayBtn.addEventListener("click", () => {
-    const todayStr = new Date().toISOString().slice(0, 10);
+  
+  dom.apodTodayBtn.addEventListener("click", function() {
+    let todayStr = new Date().toISOString().slice(0, 10);
     dom.apodDateInput.value = todayStr;
     fetchAPOD();
   });
-  dom.apodRandomBtn.addEventListener("click", () => {
-    const start = new Date("1995-06-16").getTime();
-    const end = new Date().getTime();
-    const rand = new Date(start + Math.random() * (end - start));
-    const dateStr = rand.toISOString().slice(0, 10);
+  
+  dom.apodRandomBtn.addEventListener("click", function() {
+    let start = new Date("1995-06-16").getTime();
+    let end = new Date().getTime();
+    let rand = new Date(start + Math.random() * (end - start));
+    let dateStr = rand.toISOString().slice(0, 10);
     dom.apodDateInput.value = dateStr;
     fetchAPOD(dateStr);
   });
 }
 
 async function fetchAPOD(date) {
-  dom.apodCard.innerHTML = `<div class="loader-wrap"><div class="loader"></div><p>Fetching cosmic wonder...</p></div>`;
+  dom.apodCard.innerHTML = '<div class="loader-wrap"><div class="loader"></div><p>Fetching cosmic wonder...</p></div>';
   state.apodHD = false;
+  
   try {
-    let url = `${CONFIG.APOD_API}?api_key=${CONFIG.NASA_API_KEY}&thumbs=true`;
-    if (date) url += `&date=${date}`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
+    let url = CONFIG.APOD_API + "?api_key=" + CONFIG.NASA_API_KEY + "&thumbs=true";
+    if (date) {
+      url = url + "&date=" + date;
+    }
+    
+    let res = await fetch(url);
+    if (!res.ok) {
+      throw new Error("HTTP " + res.status);
+    }
+    
+    let data = await res.json();
     state.currentAPOD = data;
     renderAPOD(data);
   } catch (err) {
@@ -477,12 +706,27 @@ async function fetchAPOD(date) {
 }
 
 function renderAPOD(data) {
-  const { title, date, explanation, url, hdurl, media_type, thumbnail_url, copyright } = data;
-  const imgSrc = (state.apodHD && hdurl) ? hdurl : url;
-  const apodId = `apod-${date}`;
-  const isSaved = isItemSaved(apodId);
-
+  let title = data.title;
+  let date = data.date;
+  let explanation = data.explanation;
+  let url = data.url;
+  let hdurl = data.hdurl;
+  let media_type = data.media_type;
+  let thumbnail_url = data.thumbnail_url;
+  let copyright = data.copyright;
+  
+  let imgSrc;
+  if (state.apodHD && hdurl) {
+    imgSrc = hdurl;
+  } else {
+    imgSrc = url;
+  }
+  
+  let apodId = "apod-" + date;
+  let isSaved = isItemSaved(apodId);
+  
   let mediaHtml = "";
+  
   if (media_type === "video") {
     if (thumbnail_url) {
       mediaHtml = `
@@ -494,84 +738,133 @@ function renderAPOD(data) {
           </a>
         </div>`;
     } else {
-      mediaHtml = `<div class="apod-iframe-wrap"><iframe src="${url}" allowfullscreen></iframe></div>`;
+      mediaHtml = '<div class="apod-iframe-wrap"><iframe src="' + url + '" allowfullscreen></iframe></div>';
     }
   } else {
-    mediaHtml = `<img class="apod-media" src="${imgSrc}" alt="${escHtml(title)}" loading="lazy" onclick="openFullscreen('${hdurl || url}')" />`;
+    mediaHtml = '<img class="apod-media" src="' + imgSrc + '" alt="' + escHtml(title) + '" loading="lazy" onclick="openFullscreen(\'' + (hdurl || url) + '\')" />';
   }
-
+  
+  let copyrightHtml = "";
+  if (copyright) {
+    copyrightHtml = '<div class="apod-copyright"><i class="fas fa-user-astronaut"></i> © ' + escHtml(copyright.replace(/\n/g, " ")) + '</div>';
+  }
+  
+  let fullResHtml = "";
+  if (hdurl || url) {
+    fullResHtml = '<a class="btn btn-primary" href="' + (hdurl || url) + '" target="_blank" rel="noopener"><i class="fas fa-expand"></i> Full Resolution</a>';
+  }
+  
+  let hdBtnHtml = "";
+  if (hdurl) {
+    let hdClass = "hd-badge";
+    if (state.apodHD) {
+      hdClass = hdClass + " active";
+    }
+    hdBtnHtml = '<button class="' + hdClass + '" id="hdToggleBtn"><i class="fas fa-expand-arrows-alt" style="font-size:0.9em"></i> HD ' + (state.apodHD ? "ON" : "OFF") + '</button>';
+  }
+  
+  let heartIcon = "fa" + (isSaved ? "s" : "r") + " fa-heart";
+  let saveStyle = isSaved ? 'style="color:var(--accent3)"' : "";
+  let saveBtnText = isSaved ? "Saved!" : "Save to Collection";
+  
   dom.apodCard.innerHTML = `
     ${mediaHtml}
     <div class="apod-body">
       <div class="apod-meta">
         <div class="apod-date"><i class="fas fa-calendar-alt"></i> ${formatDate(date)}</div>
-        ${copyright ? `<div class="apod-copyright"><i class="fas fa-user-astronaut"></i> © ${escHtml(copyright.replace(/\n/g, " "))}</div>` : ""}
+        ${copyrightHtml}
       </div>
       <h2 class="apod-title">${escHtml(title)}</h2>
       <p class="apod-desc">${escHtml(explanation)}</p>
       <div class="apod-actions">
-        ${(hdurl || url) ? `<a class="btn btn-primary" href="${hdurl || url}" target="_blank" rel="noopener"><i class="fas fa-expand"></i> Full Resolution</a>` : ""}
-        ${hdurl ? `<button class="hd-badge ${state.apodHD ? "active" : ""}" id="hdToggleBtn"><i class="fas fa-expand-arrows-alt" style="font-size:0.9em"></i> HD ${state.apodHD ? "ON" : "OFF"}</button>` : ""}
+        ${fullResHtml}
+        ${hdBtnHtml}
         <button class="btn btn-ghost" id="apodSaveBtn">
-          <i class="fa${isSaved ? "s" : "r"} fa-heart" ${isSaved ? 'style="color:var(--accent3)"' : ""}></i>
-          ${isSaved ? "Saved!" : "Save to Collection"}
+          <i class="${heartIcon}" ${saveStyle}></i>
+          ${saveBtnText}
         </button>
       </div>
     </div>
   `;
-
-  const hdBtn = $("hdToggleBtn");
+  
+  let hdBtn = $("hdToggleBtn");
   if (hdBtn) {
-    hdBtn.addEventListener("click", () => {
+    hdBtn.addEventListener("click", function() {
       state.apodHD = !state.apodHD;
-      const img = dom.apodCard.querySelector(".apod-media");
+      let img = dom.apodCard.querySelector(".apod-media");
       if (img) {
-        img.src = state.apodHD ? (hdurl || url) : url;
-        showToast(state.apodHD ? "🔭 HD image loaded" : "📷 Standard image");
+        if (state.apodHD && hdurl) {
+          img.src = hdurl;
+        } else {
+          img.src = url;
+        }
+        
+        if (state.apodHD) {
+          showToast("🔭 HD image loaded");
+        } else {
+          showToast("📷 Standard image");
+        }
       }
+      
       hdBtn.classList.toggle("active", state.apodHD);
-      hdBtn.innerHTML = `<i class="fas fa-expand-arrows-alt" style="font-size:0.9em"></i> HD ${state.apodHD ? "ON" : "OFF"}`;
+      hdBtn.innerHTML = '<i class="fas fa-expand-arrows-alt" style="font-size:0.9em"></i> HD ' + (state.apodHD ? "ON" : "OFF");
     });
   }
-
-  const apodSaveBtn = $("apodSaveBtn");
-  apodSaveBtn.addEventListener("click", () => {
-    const apodItem = buildAPODSaveItem(data);
-    const saved = isItemSaved(apodId);
+  
+  let apodSaveBtn = $("apodSaveBtn");
+  apodSaveBtn.addEventListener("click", function() {
+    let apodItem = buildAPODSaveItem(data);
+    let saved = isItemSaved(apodId);
+    
     if (saved) {
       removeFromSaved(apodId);
-      apodSaveBtn.innerHTML = `<i class="far fa-heart"></i> Save to Collection`;
+      apodSaveBtn.innerHTML = '<i class="far fa-heart"></i> Save to Collection';
       showToast("💔 Removed from your collection");
     } else {
       saveItem(apodItem);
-      apodSaveBtn.innerHTML = `<i class="fas fa-heart" style="color:var(--accent3)"></i> Saved!`;
+      apodSaveBtn.innerHTML = '<i class="fas fa-heart" style="color:var(--accent3)"></i> Saved!';
       showToast("❤️ APOD saved to your collection!");
     }
+    
     updateSavedCount();
   });
 }
 
 function buildAPODSaveItem(data) {
-  return {
+  let item = {
     _apodItem: true,
     data: [{
-      nasa_id: `apod-${data.date}`,
+      nasa_id: "apod-" + data.date,
       title: data.title,
       date_created: data.date,
       description: data.explanation,
-      media_type: data.media_type === "video" ? "video" : "image",
+      media_type: "video"
     }],
     links: [{ href: data.thumbnail_url || data.url, rel: "preview" }],
-    _apodUrl: data.hdurl || data.url,
+    _apodUrl: data.hdurl || data.url
   };
+  
+  if (data.media_type === "video") {
+    item.data[0].media_type = "video";
+  } else {
+    item.data[0].media_type = "image";
+  }
+  
+  return item;
 }
 
-// ── SAVE / UNSAVE ──
+// ==================== SAVE / UNSAVE (forEach) ====================
 function loadSavedItems() {
-  try {
-    state.savedItems = JSON.parse(localStorage.getItem("spaceExplorerSaved") || "[]");
-  } catch {
+  let saved = localStorage.getItem("spaceExplorerSaved");
+  
+  if (saved === null) {
     state.savedItems = [];
+  } else {
+    try {
+      state.savedItems = JSON.parse(saved);
+    } catch (error) {
+      state.savedItems = [];
+    }
   }
 }
 
@@ -580,59 +873,103 @@ function persistSavedItems() {
 }
 
 function isItemSaved(nasaId) {
-  return state.savedItems.some((s) => s.data?.[0]?.nasa_id === nasaId);
+  let found = false;
+  state.savedItems.forEach(function(item) {
+    if (item.data && item.data[0] && item.data[0].nasa_id === nasaId) {
+      found = true;
+    }
+  });
+  return found;
 }
 
 function saveItem(item) {
-  if (!isItemSaved(item.data?.[0]?.nasa_id)) {
-    state.savedItems.unshift(item);
+  let nasaId = item.data[0].nasa_id;
+  
+  if (!isItemSaved(nasaId)) {
+    let newArray = [item];
+    state.savedItems.forEach(function(savedItem) {
+      newArray.push(savedItem);
+    });
+    state.savedItems = newArray;
     persistSavedItems();
   }
 }
 
 function removeFromSaved(nasaId) {
-  state.savedItems = state.savedItems.filter((s) => s.data?.[0]?.nasa_id !== nasaId);
+  let newArray = [];
+  
+  state.savedItems.forEach(function(item) {
+    if (item.data && item.data[0] && item.data[0].nasa_id !== nasaId) {
+      newArray.push(item);
+    }
+  });
+  
+  state.savedItems = newArray;
   persistSavedItems();
 }
 
-function toggleSave(item, btnEl, isModalBtn = false) {
-  const nasaId = item.data?.[0]?.nasa_id;
-  const isSaved = isItemSaved(nasaId);
+function toggleSave(item, btnEl, isModalBtn) {
+  let nasaId = item.data[0].nasa_id;
+  let isSaved = isItemSaved(nasaId);
+  
   if (isSaved) {
     removeFromSaved(nasaId);
     showToast("💔 Removed from your collection");
+    
     if (!isModalBtn) {
       btnEl.classList.remove("saved");
-      btnEl.innerHTML = `<i class="far fa-heart"></i>`;
+      btnEl.innerHTML = '<i class="far fa-heart"></i>';
     }
-    if (state.activeSection === "saved") renderSavedGallery();
+    
+    if (state.activeSection === "saved") {
+      renderSavedGallery();
+    }
   } else {
     saveItem(item);
     showToast("❤️ Saved to your collection!");
+    
     if (!isModalBtn) {
       btnEl.classList.add("saved");
-      btnEl.innerHTML = `<i class="fas fa-heart"></i>`;
+      btnEl.innerHTML = '<i class="fas fa-heart"></i>';
     }
   }
+  
   updateSavedCount();
-  document.querySelectorAll(`.card-save-btn[data-nasa-id="${nasaId}"]`).forEach((b) => {
-    const nowSaved = isItemSaved(nasaId);
-    b.classList.toggle("saved", nowSaved);
-    b.innerHTML = `<i class="fa${nowSaved ? "s" : "r"} fa-heart"></i>`;
+  
+  let allBtns = document.querySelectorAll('.card-save-btn[data-nasa-id="' + nasaId + '"]');
+  allBtns.forEach(function(b) {
+    let nowSaved = isItemSaved(nasaId);
+    
+    if (nowSaved) {
+      b.classList.add("saved");
+      b.innerHTML = '<i class="fas fa-heart"></i>';
+    } else {
+      b.classList.remove("saved");
+      b.innerHTML = '<i class="far fa-heart"></i>';
+    }
   });
 }
 
 function updateSavedCount() {
-  const count = state.savedItems.length;
+  let count = state.savedItems.length;
   dom.savedCount.textContent = count;
-  dom.savedCount.classList.toggle("visible", count > 0);
+  
+  if (count > 0) {
+    dom.savedCount.classList.add("visible");
+  } else {
+    dom.savedCount.classList.remove("visible");
+  }
 }
 
-// ── SAVED GALLERY ──
+// ==================== SAVED GALLERY (forEach) ====================
 function renderSavedGallery() {
-  Array.from(dom.savedGallery.children).forEach((child) => {
-    if (!child.classList.contains("empty-state")) dom.savedGallery.removeChild(child);
+  let children = Array.from(dom.savedGallery.children);
+  children.forEach(function(child) {
+    if (!child.classList.contains("empty-state")) {
+      dom.savedGallery.removeChild(child);
+    }
   });
+  
   if (state.savedItems.length === 0) {
     dom.savedEmptyState.style.display = "flex";
     dom.savedActions.style.display = "none";
@@ -643,58 +980,110 @@ function renderSavedGallery() {
   }
 }
 
-dom.clearSavedBtn.addEventListener("click", () => {
-  if (confirm("Are you sure you want to clear all saved items?")) {
+dom.clearSavedBtn.addEventListener("click", function() {
+  let confirmClear = confirm("Are you sure you want to clear all saved items?");
+  
+  if (confirmClear) {
     state.savedItems = [];
     persistSavedItems();
     updateSavedCount();
     renderSavedGallery();
     showToast("🗑️ All saved items cleared");
-    document.querySelectorAll(".card-save-btn").forEach((b) => {
+    
+    let allSaveBtns = document.querySelectorAll(".card-save-btn");
+    allSaveBtns.forEach(function(b) {
       b.classList.remove("saved");
-      b.innerHTML = `<i class="far fa-heart"></i>`;
+      b.innerHTML = '<i class="far fa-heart"></i>';
     });
   }
 });
 
-// ── HELPERS ──
-function clearGallery() {
-  Array.from(dom.gallery.children).forEach((child) => {
-    if (!child.classList.contains("empty-state")) dom.gallery.removeChild(child);
+// ==================== FILTER BINDINGS (forEach) ====================
+function bindFilters() {
+  let filterBtns = document.querySelectorAll(".filter-btn");
+  
+  filterBtns.forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      filterBtns.forEach(function(b) {
+        b.classList.remove("active");
+      });
+      
+      btn.classList.add("active");
+      state.currentFilter = btn.dataset.filter;
+      state.currentPage = 1;
+      applyFilterSortAndRender();
+    });
   });
+}
+
+// ==================== HELPERS ====================
+function clearGallery() {
+  let children = Array.from(dom.gallery.children);
+  children.forEach(function(child) {
+    if (!child.classList.contains("empty-state")) {
+      dom.gallery.removeChild(child);
+    }
+  });
+  
   dom.emptyState.style.display = "flex";
-  dom.emptyState.innerHTML = `<i class="fas fa-satellite-dish"></i><p>Scanning the cosmos...</p>`;
+  dom.emptyState.innerHTML = '<i class="fas fa-satellite-dish"></i><p>Scanning the cosmos...</p>';
   dom.loadMoreContainer.style.display = "none";
   dom.resultsInfo.textContent = "";
 }
 
 function showEmptyState(container, el, message) {
   el.style.display = "flex";
-  el.innerHTML = `<i class="fas fa-meteor"></i><p>${message}</p>`;
+  el.innerHTML = '<i class="fas fa-meteor"></i><p>' + message + '</p>';
 }
 
 function showLoading(show) {
   state.isLoading = show;
-  dom.loadingOverlay.classList.toggle("show", show);
+  
+  if (show) {
+    dom.loadingOverlay.classList.add("show");
+  } else {
+    dom.loadingOverlay.classList.remove("show");
+  }
 }
 
 function showToast(message) {
   dom.toast.textContent = message;
   dom.toast.classList.add("show");
-  clearTimeout(dom.toast._timer);
-  dom.toast._timer = setTimeout(() => dom.toast.classList.remove("show"), 3200);
+  
+  if (dom.toast._timer) {
+    clearTimeout(dom.toast._timer);
+  }
+  
+  dom.toast._timer = setTimeout(function() {
+    dom.toast.classList.remove("show");
+  }, 3200);
 }
 
 function formatDate(dateStr) {
-  if (!dateStr) return "Date unknown";
+  if (!dateStr) {
+    return "Date unknown";
+  }
+  
   try {
-    return new Date(dateStr).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
-  } catch {
+    let date = new Date(dateStr);
+    let options = { year: "numeric", month: "long", day: "numeric" };
+    return date.toLocaleDateString("en-US", options);
+  } catch (error) {
     return dateStr;
   }
 }
 
 function escHtml(str) {
-  if (!str) return "";
-  return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+  if (!str) {
+    return "";
+  }
+  
+  let result = String(str);
+  result = result.replace(/&/g, "&amp;");
+  result = result.replace(/</g, "&lt;");
+  result = result.replace(/>/g, "&gt;");
+  result = result.replace(/"/g, "&quot;");
+  result = result.replace(/'/g, "&#039;");
+  
+  return result;
 }

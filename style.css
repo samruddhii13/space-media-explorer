@@ -856,7 +856,7 @@ body::before {
   gap: 16px;
   padding: 60px 20px;
   text-align: center;
-  color: #FFD080;
+  color: black;
 }
 
 [data-theme="light"] .empty-state {
