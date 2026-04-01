@@ -1,4 +1,4 @@
-// ==================== CONFIG (Lecture 1: const, data types) ====================
+
 const CONFIG = {
   NASA_API_KEY: "faywMKSbtCyhgDMGjJ5xR6qwJ4SUMVbN1PGvOuIx",
   SEARCH_API: "https://images-api.nasa.gov/search",
@@ -13,7 +13,7 @@ const RANDOM_TOPICS = [
   "Cassini", "Eclipse", "Dark Matter", "Asteroid Belt", "Titan", "Europa",
 ];
 
-// ==================== STATE (Lecture 1: let) ====================
+
 let state = {
   allResults: [],
   displayedItems: [],
@@ -27,7 +27,7 @@ let state = {
   currentAPOD: null,
 };
 
-// ==================== DOM ELEMENTS (Lecture 1) ====================
+
 function $(id) {
   return document.getElementById(id);
 }
@@ -65,7 +65,6 @@ const dom = {
   fullscreenImg: $("fullscreenImg"),
 };
 
-// ==================== INITIALIZATION ====================
 document.addEventListener("DOMContentLoaded", function() {
   generateStars();
   loadSavedItems();
@@ -84,7 +83,7 @@ document.addEventListener("DOMContentLoaded", function() {
   fetchAPOD();
 });
 
-// ==================== STARS GENERATION (forEach) ====================
+
 function generateStars() {
   let count = window.innerWidth < 768 ? 80 : 160;
   let starsArray = Array(count).fill();
@@ -104,7 +103,7 @@ function generateStars() {
   });
 }
 
-// ==================== THEME (Lecture 2: if/else) ====================
+
 function applyStoredTheme() {
   let saved = localStorage.getItem("spaceTheme");
   
@@ -145,7 +144,7 @@ function bindThemeToggle() {
   });
 }
 
-// ==================== NAVIGATION (forEach) ====================
+
 function bindNavigation() {
   let navButtons = document.querySelectorAll(".nav-btn[data-section]");
   
@@ -178,7 +177,7 @@ function switchSection(name) {
   }
 }
 
-// ==================== SEARCH (Lecture 12: async/await, try/catch) ====================
+
 function bindSearch() {
   dom.searchBtn.addEventListener("click", handleSearch);
   
@@ -269,7 +268,7 @@ async function fetchNASASearch(query) {
   return res.json();
 }
 
-// ==================== FILTER + SORT (forEach, sort) ====================
+
 function applyFilterSortAndRender() {
   let items;
   
@@ -376,7 +375,6 @@ function updateResultsInfo(count) {
   dom.resultsInfo.textContent = message;
 }
 
-// ==================== RENDER GALLERY (forEach) ====================
 function renderGallery(items, container, append) {
   if (!append) {
     let children = Array.from(container.children);
@@ -649,7 +647,6 @@ function closeFullscreen() {
 window.openFullscreen = openFullscreen;
 window.closeFullscreen = closeFullscreen;
 
-// ==================== APOD (Lecture 12: async/await) ====================
 function bindAPODControls() {
   dom.apodGoBtn.addEventListener("click", function() {
     let date = dom.apodDateInput.value;
@@ -853,7 +850,7 @@ function buildAPODSaveItem(data) {
   return item;
 }
 
-// ==================== SAVE / UNSAVE (forEach) ====================
+
 function loadSavedItems() {
   let saved = localStorage.getItem("spaceExplorerSaved");
   
@@ -961,7 +958,7 @@ function updateSavedCount() {
   }
 }
 
-// ==================== SAVED GALLERY (forEach) ====================
+
 function renderSavedGallery() {
   let children = Array.from(dom.savedGallery.children);
   children.forEach(function(child) {
@@ -998,7 +995,7 @@ dom.clearSavedBtn.addEventListener("click", function() {
   }
 });
 
-// ==================== FILTER BINDINGS (forEach) ====================
+
 function bindFilters() {
   let filterBtns = document.querySelectorAll(".filter-btn");
   
