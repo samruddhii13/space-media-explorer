@@ -441,7 +441,7 @@ body::before {
 .btn-ghost {
   background: transparent;
   border: 1px solid rgba(108, 99, 255, 0.25);
-  color: #9ba4b5;
+  color:black;
 }
 
 [data-theme="light"] .btn-ghost {
@@ -894,7 +894,7 @@ body::before {
 
 .date-group label {
   font-size: 0.8rem;
-  color: #9ba4b5;
+  color:black;
   letter-spacing: 1px;
 }
 
