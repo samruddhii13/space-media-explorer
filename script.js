@@ -119,7 +119,7 @@ function applyStoredTheme() {
     dom.themeIcon.className = "fas fa-sun";
   }
 }
-
+//Dark/light toogle
 function bindThemeToggle() {
   dom.themeToggle.addEventListener("click", function() {
     let current = document.documentElement.getAttribute("data-theme");
@@ -208,6 +208,7 @@ function bindSearch() {
   });
 }
 
+//searching
 async function handleSearch() {
   let query = dom.searchInput.value.trim();
   
@@ -256,7 +257,7 @@ async function handleSearch() {
     showLoading(false);
   }
 }
-
+//api fetch
 async function fetchNASASearch(query) {
   let url = CONFIG.SEARCH_API + "?q=" + encodeURIComponent(query) + "&page_size=100";
   let res = await fetch(url);
@@ -268,7 +269,7 @@ async function fetchNASASearch(query) {
   return res.json();
 }
 
-
+//Filter
 function applyFilterSortAndRender() {
   let items;
   
@@ -297,6 +298,7 @@ function applyFilterSortAndRender() {
   updateLoadMore(items.length);
 }
 
+//sorting
 function sortItems(items, sortType) {
   let copy = [];
   items.forEach(function(item) {
@@ -341,7 +343,8 @@ function sortItems(items, sortType) {
   return copy;
 }
 
-// ==================== LOAD MORE ====================
+
+//load more
 function loadMore() {
   state.currentPage++;
   let start = (state.currentPage - 1) * CONFIG.PAGE_SIZE;
@@ -467,7 +470,7 @@ function buildCardMedia(type, thumbUrl) {
   return '<div class="card-media-icon"><i class="fas fa-satellite"></i><span>Media</span></div>';
 }
 
-// ==================== MODAL (Lecture 12: async/await) ====================
+
 function bindModal() {
   dom.modalClose.addEventListener("click", closeModal);
   dom.modalOverlay.addEventListener("click", function(e) {
@@ -633,7 +636,7 @@ function closeModal() {
   });
 }
 
-// ==================== FULLSCREEN ====================
+
 function openFullscreen(src) {
   dom.fullscreenImg.src = src;
   dom.fullscreenOverlay.classList.add("open");
@@ -905,6 +908,7 @@ function removeFromSaved(nasaId) {
   persistSavedItems();
 }
 
+//toogle Saved
 function toggleSave(item, btnEl, isModalBtn) {
   let nasaId = item.data[0].nasa_id;
   let isSaved = isItemSaved(nasaId);
@@ -1013,7 +1017,7 @@ function bindFilters() {
   });
 }
 
-// ==================== HELPERS ====================
+
 function clearGallery() {
   let children = Array.from(dom.gallery.children);
   children.forEach(function(child) {
