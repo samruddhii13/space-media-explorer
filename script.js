@@ -61,8 +61,6 @@ const dom = {
   stars: $("stars"),
   themeToggle: $("themeToggle"),
   themeIcon: $("themeIcon"),
-  fullscreenOverlay: $("fullscreenOverlay"),
-  fullscreenImg: $("fullscreenImg"),
 };
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -482,7 +480,6 @@ function bindModal() {
   document.addEventListener("keydown", function(e) {
     if (e.key === "Escape") {
       closeModal();
-      closeFullscreen();
     }
   });
 }
@@ -538,7 +535,7 @@ async function openModal(item) {
       }
       
       if (imgSrc) {
-        mediaHtml = '<img class="modal-media" src="' + imgSrc + '" alt="' + escHtml(title) + '" style="cursor:zoom-in" onclick="openFullscreen(\'' + imgSrc + '\')" />';
+        mediaHtml = '<img class="modal-media" src="' + imgSrc + '" alt="' + escHtml(title) + '" />';
       } else {
         mediaHtml = '<div class="card-media-icon" style="min-height:200px;border-radius:var(--radius);"><i class="fas fa-image"></i><span>Image not available</span></div>';
       }
@@ -636,20 +633,6 @@ function closeModal() {
   });
 }
 
-
-function openFullscreen(src) {
-  dom.fullscreenImg.src = src;
-  dom.fullscreenOverlay.classList.add("open");
-}
-
-function closeFullscreen() {
-  dom.fullscreenOverlay.classList.remove("open");
-  dom.fullscreenImg.src = "";
-}
-
-window.openFullscreen = openFullscreen;
-window.closeFullscreen = closeFullscreen;
-
 function bindAPODControls() {
   dom.apodGoBtn.addEventListener("click", function() {
     let date = dom.apodDateInput.value;
@@ -741,7 +724,7 @@ function renderAPOD(data) {
       mediaHtml = '<div class="apod-iframe-wrap"><iframe src="' + url + '" allowfullscreen></iframe></div>';
     }
   } else {
-    mediaHtml = '<img class="apod-media" src="' + imgSrc + '" alt="' + escHtml(title) + '" loading="lazy" onclick="openFullscreen(\'' + (hdurl || url) + '\')" />';
+    mediaHtml = '<img class="apod-media" src="' + imgSrc + '" alt="' + escHtml(title) + '" loading="lazy" />';
   }
   
   let copyrightHtml = "";
